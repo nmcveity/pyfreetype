@@ -58,8 +58,98 @@ static PyObject * pyfreetype_Font_charmaps(PyObject *self, PyObject *args)
 	return (PyObject *)iter;
 }
 
+static PyObject * pyfreetype_Font_set_char_size(PyObject * self, PyObject * args)
+{
+	int char_width = 0;
+	int char_height = 0;
+	int horz_res = 0;
+	int vert_res = 0;
+	pyfreetype_Font * font = (pyfreetype_Font *)self;
+	FT_Error res = 0;
+
+	if (!PyArg_ParseTuple(args, "iiii", &char_width, &char_height, &horz_res, &vert_res))
+	{
+		return NULL;
+	}
+
+	res = FT_Set_Char_Size(font->m_face, char_width<<6, char_height<<6, horz_res, vert_res);
+
+	if (res)
+		return NULL;
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * pyfreetype_Font_set_pixel_size(PyObject * self, PyObject * args)
+{
+	int char_width = 0;
+	int char_height = 0;
+	pyfreetype_Font * font = (pyfreetype_Font *)self;
+	FT_Error res = 0;
+
+	if (!PyArg_ParseTuple(args, "ii", &char_width, &char_height))
+		return NULL;
+
+	res = FT_Set_Pixel_Sizes(font->m_face, char_width, char_height);
+
+	if (res)
+		return NULL;
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * pyfreetype_Font_get_char_bitmap(PyObject * self, PyObject * args)
+{
+	PyObject * str = NULL;
+	pyfreetype_Font * font = (pyfreetype_Font *)self;
+	FT_UInt glyphIndex = 0;
+	FT_Error res = 0;
+	Py_UNICODE * buffer = NULL;
+	PyObject * bytes = NULL;
+
+	if (!PyArg_ParseTuple(args, "O", &str))
+	{
+		PyErr_SetString(PyExc_TypeError, "Pass in a string");
+		return NULL;
+	}
+
+	if (str->ob_type != &PyUnicode_Type)
+	{
+		PyErr_SetString(PyExc_TypeError, "Not a unicode string");
+		return NULL;
+	}
+
+	buffer = PyUnicode_AS_UNICODE(str);
+
+	glyphIndex = FT_Get_Char_Index(font->m_face, buffer[0]);
+
+	res = FT_Load_Glyph(font->m_face, glyphIndex, FT_LOAD_RENDER);
+
+	if (res)
+	{
+		PyErr_SetString(PyExc_TypeError, "Failed to load glyph");
+		return NULL;
+	}
+
+	bytes = PyByteArray_FromStringAndSize(font->m_face->glyph->bitmap.buffer, font->m_face->glyph->bitmap.pitch * font->m_face->glyph->bitmap.rows);
+
+	return Py_BuildValue("(i,i,O)", font->m_face->glyph->bitmap.width, font->m_face->glyph->bitmap.rows, bytes);
+}
+
+static PyObject * pyfreetype_Font_get_char_info(PyObject * self, PyObject * args)
+{
+	return NULL;
+}
+
 static PyMethodDef font_methods[] = {
-	{"charmaps",  pyfreetype_Font_charmaps, METH_VARARGS, "Iterate all of the charmaps available to the font."},
+
+	{"charmaps",			pyfreetype_Font_charmaps,			METH_VARARGS,	"Iterate all of the charmaps available to the font."},
+	{"set_char_size",		pyfreetype_Font_set_char_size,		METH_VARARGS,	"Set the character size (in points) for subsequent operations."},
+	{"set_pixel_size",		pyfreetype_Font_set_pixel_size,		METH_VARARGS,	"Set the character size (in pixels) for subsequent operations."},
+	{"get_char_bitmap",		pyfreetype_Font_get_char_bitmap,	METH_VARARGS,	"Set the character size (in pixels) for subsequent operations."},
+	{"get_char_info",		pyfreetype_Font_get_char_info,		METH_VARARGS,	"Set the character size (in pixels) for subsequent operations."},
 
 	{NULL}
 };
