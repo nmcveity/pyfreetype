@@ -2,6 +2,7 @@
 
 #include "pyfreetype_font.h"
 #include "pyfreetype_charmapiter.h"
+#include "pyfreetype_glyphmetrics.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -76,4 +77,5 @@ PyMODINIT_FUNC initpyfreetype(void)
 
 	pyfreetype_register_font_type(module);
 	pyfreetype_register_charmapiter_type(module);
+	pyfreetype_register_glyphmetrics_type(module);
 }

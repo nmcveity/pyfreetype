@@ -465,6 +465,14 @@
 				RelativePath=".\source\pyfreetype_font.h"
 				>
 			</File>
+			<File
+				RelativePath=".\source\pyfreetype_glyphmetrics.c"
+				>
+			</File>
+			<File
+				RelativePath=".\source\pyfreetype_glyphmetrics.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

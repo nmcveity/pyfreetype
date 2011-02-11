@@ -1,5 +1,6 @@
 #include "pyfreetype_font.h"
 #include "pyfreetype_charmapiter.h"
+#include "pyfreetype_glyphmetrics.h"
 
 #include "structmember.h"		// PyMemberDef, T_*
 
@@ -138,9 +139,54 @@ static PyObject * pyfreetype_Font_get_char_bitmap(PyObject * self, PyObject * ar
 	return Py_BuildValue("(i,i,O)", font->m_face->glyph->bitmap.width, font->m_face->glyph->bitmap.rows, bytes);
 }
 
-static PyObject * pyfreetype_Font_get_char_info(PyObject * self, PyObject * args)
+static PyObject * pyfreetype_Font_get_char_metrics(PyObject * self, PyObject * args)
 {
-	return NULL;
+	PyObject * str = NULL;
+	pyfreetype_Font * font = (pyfreetype_Font *)self;
+	FT_UInt glyphIndex = 0;
+	FT_Error res = 0;
+	Py_UNICODE * buffer = NULL;
+	pyfreetype_GlyphMetrics * metrics = NULL;
+
+	if (!PyArg_ParseTuple(args, "O", &str))
+	{
+		PyErr_SetString(PyExc_TypeError, "Pass in a string");
+		return NULL;
+	}
+
+	if (str->ob_type != &PyUnicode_Type)
+	{
+		PyErr_SetString(PyExc_TypeError, "Not a unicode string");
+		return NULL;
+	}
+
+	buffer = PyUnicode_AS_UNICODE(str);
+
+	glyphIndex = FT_Get_Char_Index(font->m_face, buffer[0]);
+
+	res = FT_Load_Glyph(font->m_face, glyphIndex, 0);
+
+	if (res)
+	{
+		PyErr_SetString(PyExc_TypeError, "Failed to load glyph");
+		return NULL;
+	}
+
+	metrics = (pyfreetype_GlyphMetrics *)pyfreetype_GlyphMetricsType.tp_alloc(&pyfreetype_GlyphMetricsType, 0);
+	metrics->m_width = font->m_face->glyph->metrics.width / 64.0f;
+	metrics->m_height = font->m_face->glyph->metrics.height / 64.0f;
+	metrics->m_horiBearingX = font->m_face->glyph->metrics.horiBearingX / 64.0f;
+	metrics->m_horiBearingY = font->m_face->glyph->metrics.horiBearingY / 64.0f;
+	metrics->m_horiAdvance = font->m_face->glyph->metrics.horiAdvance / 64.0f;
+	metrics->m_vertBearingX = font->m_face->glyph->metrics.vertBearingX / 64.0f;
+	metrics->m_vertBearingY = font->m_face->glyph->metrics.vertBearingY / 64.0f;
+	metrics->m_vertAdvance = font->m_face->glyph->metrics.vertAdvance / 64.0f;
+	metrics->m_linearHoriAdvance = font->m_face->glyph->linearHoriAdvance / 65536.0f;
+	metrics->m_linearVertAdvance = font->m_face->glyph->linearVertAdvance / 65536.0f;
+	metrics->m_advanceX = font->m_face->glyph->advance.x / 64.0f;
+	metrics->m_advanceY = font->m_face->glyph->advance.y / 64.0f;
+
+	return (PyObject*)metrics;
 }
 
 static PyMethodDef font_methods[] = {
@@ -149,7 +195,7 @@ static PyMethodDef font_methods[] = {
 	{"set_char_size",		pyfreetype_Font_set_char_size,		METH_VARARGS,	"Set the character size (in points) for subsequent operations."},
 	{"set_pixel_size",		pyfreetype_Font_set_pixel_size,		METH_VARARGS,	"Set the character size (in pixels) for subsequent operations."},
 	{"get_char_bitmap",		pyfreetype_Font_get_char_bitmap,	METH_VARARGS,	"Set the character size (in pixels) for subsequent operations."},
-	{"get_char_info",		pyfreetype_Font_get_char_info,		METH_VARARGS,	"Set the character size (in pixels) for subsequent operations."},
+	{"get_char_metrics",	pyfreetype_Font_get_char_metrics,	METH_VARARGS,	"Returns a structure with information about the character specified."},
 
 	{NULL}
 };

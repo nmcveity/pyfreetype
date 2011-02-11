@@ -58,3 +58,8 @@ for test in test_set:
 	image.putdata(pixels)
 	image.save("test/%s/%d_%d-%s.png" % (font_name, font_width, font_height, ord(test)))
 
+for test in test_set:
+	metrics = font.get_char_metrics(unicode(test))
+	
+	print "A: %d,%d\t%d,%d,%d\t%d,%d,%d\t%d,%d\t%d,%d" % (metrics.width, metrics.height, metrics.horiBearingX, metrics.horiBearingY, metrics.horiAdvance, metrics.vertBearingX, metrics.vertBearingY, metrics.vertAdvance, metrics.advanceX, metrics.advanceY, metrics.linearHoriAdvance, metrics.linearVertAdvance)
+	
