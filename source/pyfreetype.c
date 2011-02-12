@@ -3,6 +3,8 @@
 #include "pyfreetype_font.h"
 #include "pyfreetype_charmapiter.h"
 #include "pyfreetype_glyphmetrics.h"
+#include "pyfreetype_bitmapdata.h"
+#include "pyfreetype_helpers.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -17,7 +19,6 @@ static PyObject * pyfreetype_ft_version(PyObject * self, PyObject * args)
 static PyObject * pyfreetype_open_font(PyObject * self, PyObject * args)
 {
 	pyfreetype_Font * font = (pyfreetype_Font*)pyfreetype_FontType.tp_alloc(&pyfreetype_FontType, 0);
-
 	const char * filename;
 	int index = 0;
 	FT_Error err = 0;
@@ -52,13 +53,29 @@ static PyObject * pyfreetype_open_font(PyObject * self, PyObject * args)
 	font->m_is_italic = PyBool_FromLong(font->m_face->style_flags & FT_STYLE_FLAG_ITALIC);
 	font->m_is_bold = PyBool_FromLong(font->m_face->style_flags & FT_STYLE_FLAG_BOLD);
 
+	font->m_bbox = Py_BuildValue("(ffff)", 
+		PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(font->m_face->bbox.xMin), 
+		PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(font->m_face->bbox.yMin), 
+		PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(font->m_face->bbox.xMax), 
+		PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(font->m_face->bbox.yMax)
+	);
+
+	font->m_units_per_EM = PyInt_FromLong(font->m_face->units_per_EM);
+	font->m_ascender = PyInt_FromLong(font->m_face->ascender);
+	font->m_descender = PyInt_FromLong(font->m_face->descender);
+	font->m_height = PyInt_FromLong(font->m_face->height);
+	font->m_max_advance_width = PyInt_FromLong(font->m_face->max_advance_width);
+	font->m_max_advance_height = PyInt_FromLong(font->m_face->max_advance_height);
+	font->m_underline_position = PyInt_FromLong(font->m_face->underline_position);
+	font->m_underline_thickness = PyInt_FromLong(font->m_face->underline_thickness);
+
 	return (PyObject*)font;
 }
 
 static PyMethodDef ModuleMethods[] = 
 {
-	{"version",		pyfreetype_ft_version,	METH_VARARGS,	"Retrieve the free type version used by this module."},
-	{"open_font",	pyfreetype_open_font,	METH_VARARGS,	"Return a new font object."},
+	{"version",		pyfreetype_ft_version,	METH_VARARGS,	"Retrieve the freetype version used by this module."},
+	{"open_font",	pyfreetype_open_font,	METH_VARARGS,	"Load a new font object and return it."},
 
 	{NULL, NULL, 0, NULL}        /* Sentinel */
 };
@@ -78,4 +95,5 @@ PyMODINIT_FUNC initpyfreetype(void)
 	pyfreetype_register_font_type(module);
 	pyfreetype_register_charmapiter_type(module);
 	pyfreetype_register_glyphmetrics_type(module);
+	pyfreetype_register_bitmapdata_type(module);
 }

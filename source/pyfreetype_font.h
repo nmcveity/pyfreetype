@@ -34,6 +34,20 @@ typedef struct pyfreetype_Font_ {
 	/* style flags, boolean */
 	PyObject * m_is_bold;
 	PyObject * m_is_italic;
+
+	/* global metrics */
+	PyObject * m_bbox;
+	PyObject * m_units_per_EM;
+	PyObject * m_ascender;
+	PyObject * m_descender;
+	PyObject * m_height;
+	PyObject * m_max_advance_width;
+	PyObject * m_max_advance_height;
+	PyObject * m_underline_position;
+	PyObject * m_underline_thickness;
+
+	/* size metrics */
+	PyObject * m_size;
 } pyfreetype_Font;
 
 extern PyTypeObject pyfreetype_FontType;

@@ -114,8 +114,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				EnableIntrinsicFunctions="true"
+				Optimization="0"
+				EnableIntrinsicFunctions="false"
 				AdditionalIncludeDirectories="freetype/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PYFREETYPE_EXPORTS"
 				RuntimeLibrary="2"
@@ -450,6 +450,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\source\pyfreetype_bitmapdata.c"
+				>
+			</File>
+			<File
+				RelativePath=".\source\pyfreetype_bitmapdata.h"
+				>
+			</File>
+			<File
 				RelativePath=".\source\pyfreetype_charmapiter.c"
 				>
 			</File>
@@ -471,6 +479,18 @@
 			</File>
 			<File
 				RelativePath=".\source\pyfreetype_glyphmetrics.h"
+				>
+			</File>
+			<File
+				RelativePath=".\source\pyfreetype_helpers.h"
+				>
+			</File>
+			<File
+				RelativePath=".\source\pyfreetype_sizemetrics.c"
+				>
+			</File>
+			<File
+				RelativePath=".\source\pyfreetype_sizemetrics.h"
 				>
 			</File>
 		</Filter>

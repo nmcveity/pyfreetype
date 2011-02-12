@@ -33,18 +33,18 @@ static PyMethodDef metrics_methods[] = {
 };
 
 static PyMemberDef metrics_members[] = {
-	{"width",				T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_width), 0, "Width of character, in points."},
-	{"height",				T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_height), 0, "Height of character, in points."},
-	{"horiBearingX",		T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_horiBearingX), 0, "Horizontal Bearing X, in points."},
-	{"horiBearingY",		T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_horiBearingY), 0, "Horizontal Bearing Y, in points."},
-	{"horiAdvance",			T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_horiAdvance), 0, "Horizontal Advance, in points."},
-	{"vertBearingX",		T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_vertBearingX), 0, "Vertical Bearing X, in points."},
-	{"vertBearingY",		T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_vertBearingY), 0, "Vertical Bearing X, in points."},
-	{"vertAdvance",			T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_vertAdvance), 0, "Vertical Advance, in points."},
-	{"linearHoriAdvance",	T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_linearHoriAdvance), 0, "Horizontal Advance, in points."},
-	{"linearVertAdvance",	T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_linearVertAdvance), 0, "Vertical Bearing X, in points."},
-	{"advanceX",			T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_advanceX), 0, "Vertical Bearing X, in points."},
-	{"advanceY",			T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_advanceY), 0, "Vertical Advance, in points."},
+	{"width",				T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_width), READONLY, "Width of character, in points."},
+	{"height",				T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_height), READONLY, "Height of character, in points."},
+	{"horiBearingX",		T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_horiBearingX), READONLY, "Horizontal Bearing X, in points."},
+	{"horiBearingY",		T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_horiBearingY), READONLY, "Horizontal Bearing Y, in points."},
+	{"horiAdvance",			T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_horiAdvance), READONLY, "Horizontal Advance, in points."},
+	{"vertBearingX",		T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_vertBearingX), READONLY, "Vertical Bearing X, in points."},
+	{"vertBearingY",		T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_vertBearingY), READONLY, "Vertical Bearing X, in points."},
+	{"vertAdvance",			T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_vertAdvance), READONLY, "Vertical Advance, in points."},
+	{"linearHoriAdvance",	T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_linearHoriAdvance), READONLY, "Horizontal Advance, in points."},
+	{"linearVertAdvance",	T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_linearVertAdvance), READONLY, "Vertical Bearing X, in points."},
+	{"advanceX",			T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_advanceX), READONLY, "Vertical Bearing X, in points."},
+	{"advanceY",			T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_advanceY), READONLY, "Vertical Advance, in points."},
 
 	{NULL}
 };
