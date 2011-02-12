@@ -14,7 +14,7 @@ def build(fontfile, size, charset, max_texture_width=256, spacing=4):
 	max_height = 0
 	
 	for ch in charset:
-		bitmap = font.get_char_bitmap(unicode(ch))
+		bitmap = font.get_char_bitmap(ord(unicode(ch)))
 		bitmaps[ch] = bitmap
 		
 		max_width = max(max_width, bitmap.width)
@@ -35,8 +35,8 @@ def build(fontfile, size, charset, max_texture_width=256, spacing=4):
 	metrics_dict = {}
 	
 	for ch in charset:
-		bitmap = font.get_char_bitmap(unicode(ch))
-		metrics = font.get_char_metrics(unicode(ch))
+		bitmap = font.get_char_bitmap(ord(unicode(ch)))
+		metrics = font.get_char_metrics(ord(unicode(ch)))
 		
 		metrics_dict[ch] = {
 			'width':				metrics.width,
@@ -68,6 +68,22 @@ def build(fontfile, size, charset, max_texture_width=256, spacing=4):
 		if pen_x + max_width >= tex.size[0]:
 			pen_x = 0
 			pen_y += max_height
+	
+	kerning_pairs = []
+	
+	for left in charset:
+		for right in charset:
+			x, y = font.get_kerning(ord(unicode(left)), ord(unicode(right)))
+			
+			if x != 0 or y != 0:
+				kerning_pairs.append({
+					'left': left,
+					'right': right,
+					'x': x,
+					'y': y,
+				})
+	
+	metrics_dict['kerning_pairs'] = kerning_pairs
 	
 	return tex, json.dumps(metrics_dict, indent=4)
 

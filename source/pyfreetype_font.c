@@ -142,7 +142,7 @@ static PyObject * pyfreetype_Font_set_pixel_size(PyObject * self, PyObject * arg
 
 static PyObject * pyfreetype_Font_get_char_bitmap(PyObject * self, PyObject * args)
 {
-	PyObject * str = NULL;
+	int codepoint = 0;
 	pyfreetype_Font * font = (pyfreetype_Font *)self;
 	FT_UInt glyphIndex = 0;
 	FT_Error res = 0;
@@ -151,21 +151,10 @@ static PyObject * pyfreetype_Font_get_char_bitmap(PyObject * self, PyObject * ar
 	PyObject * bytes = NULL;
 	pyfreetype_BitmapData * bitmap = NULL;
 
-	if (!PyArg_ParseTuple(args, "O", &str))
-	{
-		PyErr_SetString(PyExc_TypeError, "Pass in a string");
+	if (!PyArg_ParseTuple(args, "i", &codepoint))
 		return NULL;
-	}
 
-	if (str->ob_type != &PyUnicode_Type)
-	{
-		PyErr_SetString(PyExc_TypeError, "Not a unicode string");
-		return NULL;
-	}
-
-	buffer = PyUnicode_AS_UNICODE(str);
-
-	glyphIndex = FT_Get_Char_Index(font->m_face, buffer[0]);
+	glyphIndex = FT_Get_Char_Index(font->m_face, codepoint);
 
 	res = FT_Load_Glyph(font->m_face, glyphIndex, FT_LOAD_RENDER);
 
@@ -215,28 +204,19 @@ static PyObject * pyfreetype_Font_get_char_bitmap(PyObject * self, PyObject * ar
 
 static PyObject * pyfreetype_Font_get_char_metrics(PyObject * self, PyObject * args)
 {
-	PyObject * str = NULL;
+	int codepoint = 0;
 	pyfreetype_Font * font = (pyfreetype_Font *)self;
 	FT_UInt glyphIndex = 0;
 	FT_Error res = 0;
 	Py_UNICODE * buffer = NULL;
 	pyfreetype_GlyphMetrics * metrics = NULL;
 
-	if (!PyArg_ParseTuple(args, "O", &str))
+	if (!PyArg_ParseTuple(args, "i", &codepoint))
 	{
-		PyErr_SetString(PyExc_TypeError, "Pass in a string");
 		return NULL;
 	}
 
-	if (str->ob_type != &PyUnicode_Type)
-	{
-		PyErr_SetString(PyExc_TypeError, "Not a unicode string");
-		return NULL;
-	}
-
-	buffer = PyUnicode_AS_UNICODE(str);
-
-	glyphIndex = FT_Get_Char_Index(font->m_face, buffer[0]);
+	glyphIndex = FT_Get_Char_Index(font->m_face, codepoint);
 
 	res = FT_Load_Glyph(font->m_face, glyphIndex, 0);
 
@@ -270,9 +250,38 @@ static PyObject * pyfreetype_Font_get_current_size_metrics(PyObject * self, PyOb
 	return NULL;
 }
 
-static PyObject * pyfreetype_Font_get_kerning(PyObject * self, PyObject * args)
+static PyObject * pyfreetype_Font_get_kerning(PyObject * self, PyObject * args, PyObject * kwargs)
 {
-	return NULL;
+	int first = 0;
+	int second = 0;
+	int mode = FT_KERNING_DEFAULT;
+	FT_Vector kerning;
+	FT_Error res = 0;
+	static char * keywords[] = {"left", "right", "mode", NULL};
+
+	pyfreetype_Font * font = (pyfreetype_Font *)self;
+
+	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii|i", keywords, &first, &second, mode))
+		return NULL;
+
+	switch (mode)
+	{
+	case FT_KERNING_DEFAULT:
+	case FT_KERNING_UNFITTED:
+	case FT_KERNING_UNSCALED:
+		break;
+
+	default:
+		PyErr_SetString(PyExc_TypeError, "Invalid mode parameter");
+		return NULL;
+	}
+
+	res = FT_Get_Kerning(font->m_face, first, second, mode, &kerning);
+
+	if (res)
+		return pyfreetype_SetErrorAndReturn("FT_Get_Kerning", res);
+
+	return Py_BuildValue("(ff)", PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(kerning.x), PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(kerning.y));
 }
 
 static PyMethodDef font_methods[] = {
@@ -284,7 +293,7 @@ static PyMethodDef font_methods[] = {
 	{"get_char_metrics",			pyfreetype_Font_get_char_metrics,			METH_VARARGS,	"Returns a structure with information about the character specified."},
 	{"get_global_design_metrics",	pyfreetype_Font_get_global_design_metrics,	METH_VARARGS,	"Returns a structure with information about the character specified."},
 	{"get_current_size_metrics",	pyfreetype_Font_get_current_size_metrics,	METH_VARARGS,	"Returns a structure with information about the character specified."},
-	{"get_kerning",					pyfreetype_Font_get_kerning,				METH_VARARGS,	"Returns a structure with information about the character specified."},
+	{"get_kerning",					(PyCFunction)pyfreetype_Font_get_kerning,	METH_VARARGS|METH_KEYWORDS,	"Returns a structure with information about the character specified."},
 
 	{NULL}
 };
@@ -342,4 +351,8 @@ void pyfreetype_register_font_type(PyObject * module)
 
 	Py_INCREF(&pyfreetype_FontType);
 	PyModule_AddObject(module, "Font", (PyObject *)&pyfreetype_FontType);
+
+	PyDict_SetItemString(pyfreetype_FontType.tp_dict, "FT_KERNING_DEFAULT", PyLong_FromLong(FT_KERNING_DEFAULT));
+	PyDict_SetItemString(pyfreetype_FontType.tp_dict, "FT_KERNING_UNFITTED", PyLong_FromLong(FT_KERNING_UNFITTED));
+	PyDict_SetItemString(pyfreetype_FontType.tp_dict, "FT_KERNING_UNSCALED", PyLong_FromLong(FT_KERNING_UNSCALED));
 }
