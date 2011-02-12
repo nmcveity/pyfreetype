@@ -9,11 +9,48 @@
 
 #include FT_BITMAP_H
 
-extern FT_Library ftlib;
-
 static PyObject * pyfreetype_Font_repr(pyfreetype_Font * self)
 {
 	return PyString_FromFormat("<font '%s'>", self->m_face->family_name);
+}
+
+static void pyfreetype_Font_dealloc(pyfreetype_Font * self)
+{
+	Py_DECREF(self->m_numCharMaps);
+	Py_DECREF(self->m_familyName);
+	Py_DECREF(self->m_styleName);
+	Py_DECREF(self->m_is_flag_scalable);
+	Py_DECREF(self->m_is_flag_fixed_sizes);
+	Py_DECREF(self->m_is_flag_fixed_width);
+	Py_DECREF(self->m_is_flag_sfnt);
+	Py_DECREF(self->m_is_flag_horizontal);
+	Py_DECREF(self->m_is_flag_vertical);
+	Py_DECREF(self->m_is_flag_kerning);
+	Py_DECREF(self->m_is_flag_fast_glyphs);
+	Py_DECREF(self->m_is_flag_multiple_masters);
+	Py_DECREF(self->m_is_flag_names);
+	Py_DECREF(self->m_is_flag_external_stream);
+	Py_DECREF(self->m_is_flag_hinter);
+	Py_DECREF(self->m_is_flag_cid_keyed);
+	Py_DECREF(self->m_is_flag_tricky);
+	Py_DECREF(self->m_is_bold);
+	Py_DECREF(self->m_is_italic);
+	Py_DECREF(self->m_bbox);
+	Py_DECREF(self->m_units_per_EM);
+	Py_DECREF(self->m_ascender);
+	Py_DECREF(self->m_descender);
+	Py_DECREF(self->m_height);
+	Py_DECREF(self->m_max_advance_width);
+	Py_DECREF(self->m_max_advance_height);
+	Py_DECREF(self->m_underline_position);
+	Py_DECREF(self->m_underline_thickness);
+
+	if (self->m_size)
+		Py_DECREF(self->m_size);
+
+	FT_Done_Face(self->m_face);
+
+	self->ob_type->tp_free((PyObject*)self);
 }
 
 PyTypeObject pyfreetype_FontType= {
@@ -22,7 +59,7 @@ PyTypeObject pyfreetype_FontType= {
 	"pyfreetype.Font",					/*tp_name*/
 	sizeof(pyfreetype_Font),			/*tp_basicsize*/
 	0,                         			/*tp_itemsize*/
-	0,                         			/*tp_dealloc*/
+	(destructor)pyfreetype_Font_dealloc,/*tp_dealloc*/
 	0,                         			/*tp_print*/
 	0,                         			/*tp_getattr*/
 	0,                         			/*tp_setattr*/
@@ -51,13 +88,6 @@ static PyObject * pyfreetype_Font_charmaps(PyObject *self, PyObject *args)
 	if (!iter) 
 		return NULL;
 
-	/* I'm not sure if it's strictly necessary. */
-	if (!PyObject_Init((PyObject*)iter, &pyfreetype_CharMapIterType)) 
-	{
-		Py_DECREF(iter);
-		return NULL;
-	}
-
 	iter->m_face = font;
 	iter->m_index = 0;
 
@@ -66,24 +96,18 @@ static PyObject * pyfreetype_Font_charmaps(PyObject *self, PyObject *args)
 	return (PyObject *)iter;
 }
 
-static void pyfreetype_Font_update_size_metrics(pyfreetype_Font * font)
+static int pyfreetype_Font_update_size_metrics(pyfreetype_Font * font)
 {
 	pyfreetype_SizeMetrics * size_metrics = (pyfreetype_SizeMetrics *)font->m_size;
 
+	if (size_metrics)
+		Py_DECREF(size_metrics);
+
+	size_metrics = PyObject_New(pyfreetype_SizeMetrics, &pyfreetype_SizeMetricsType);
+
 	if (size_metrics == NULL)
-		size_metrics = PyObject_New(pyfreetype_SizeMetrics, &pyfreetype_SizeMetricsType);
+		return FALSE;
 
-	/*
-	int m_x_ppem;
-	int m_y_ppem;
-
-	float m_x_scale;
-	float m_y_scale;
-	float m_ascender;
-	float m_descender;
-	float m_height;
-	float m_max_advance;
-*/
 	size_metrics->m_x_ppem = font->m_face->size->metrics.x_ppem;
 	size_metrics->m_y_ppem = font->m_face->size->metrics.y_ppem;
 	size_metrics->m_x_scale = PYFREETYPE_16_16_FRACTIONAL_TO_FLOAT(font->m_face->size->metrics.x_scale);
@@ -92,6 +116,8 @@ static void pyfreetype_Font_update_size_metrics(pyfreetype_Font * font)
 	size_metrics->m_descender = PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(font->m_face->size->metrics.descender);
 	size_metrics->m_height = PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(font->m_face->size->metrics.height);
 	size_metrics->m_max_advance = PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(font->m_face->size->metrics.max_advance);
+
+	return TRUE;
 }
 
 static PyObject * pyfreetype_Font_set_char_size(PyObject * self, PyObject * args)
@@ -104,16 +130,15 @@ static PyObject * pyfreetype_Font_set_char_size(PyObject * self, PyObject * args
 	FT_Error res = 0;
 
 	if (!PyArg_ParseTuple(args, "iiii", &char_width, &char_height, &horz_res, &vert_res))
-	{
 		return NULL;
-	}
 
 	res = FT_Set_Char_Size(font->m_face, char_width<<6, char_height<<6, horz_res, vert_res);
 
 	if (res)
 		return pyfreetype_SetErrorAndReturn("FT_Set_Char_Size", res);
 
-	pyfreetype_Font_update_size_metrics(font);
+	if (!pyfreetype_Font_update_size_metrics(font))
+		return NULL;
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -134,7 +159,8 @@ static PyObject * pyfreetype_Font_set_pixel_size(PyObject * self, PyObject * arg
 	if (res)
 		return pyfreetype_SetErrorAndReturn("FT_Set_Pixel_Sizes", res);
 
-	pyfreetype_Font_update_size_metrics(font);
+	if (!pyfreetype_Font_update_size_metrics(font))
+		return NULL;
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -179,7 +205,14 @@ static PyObject * pyfreetype_Font_get_char_bitmap(PyObject * self, PyObject * ar
 		bytes = PyByteArray_FromStringAndSize(ftbitmap->buffer, ftbitmap->width * ftbitmap->rows);
 	}
 
-	bitmap = (pyfreetype_BitmapData *)PyObject_New(pyfreetype_BitmapData, &pyfreetype_BitmapDataType);
+	
+	bitmap = PyObject_New(pyfreetype_BitmapData, &pyfreetype_BitmapDataType);
+
+	if (bitmap == NULL)
+	{
+		Py_DECREF(bytes);
+		return NULL;
+	}
 
 	if (font->m_face->glyph->format == FT_GLYPH_FORMAT_BITMAP)
 	{
@@ -223,7 +256,12 @@ static PyObject * pyfreetype_Font_get_char_metrics(PyObject * self, PyObject * a
 	if (res)
 		return pyfreetype_SetErrorAndReturn("FT_Load_Glyph", res);
 
-	metrics = (pyfreetype_GlyphMetrics *)pyfreetype_GlyphMetricsType.tp_alloc(&pyfreetype_GlyphMetricsType, 0);
+	
+	metrics = PyObject_New(pyfreetype_GlyphMetrics, &pyfreetype_GlyphMetricsType);
+
+	if (metrics == NULL)
+		return NULL;
+
 	metrics->m_width = font->m_face->glyph->metrics.width / 64.0f;
 	metrics->m_height = font->m_face->glyph->metrics.height / 64.0f;
 	metrics->m_horiBearingX = font->m_face->glyph->metrics.horiBearingX / 64.0f;
@@ -240,16 +278,6 @@ static PyObject * pyfreetype_Font_get_char_metrics(PyObject * self, PyObject * a
 	return (PyObject*)metrics;
 }
 
-static PyObject * pyfreetype_Font_get_global_design_metrics(PyObject * self, PyObject * args)
-{
-	return NULL;
-}
-
-static PyObject * pyfreetype_Font_get_current_size_metrics(PyObject * self, PyObject * args)
-{
-	return NULL;
-}
-
 static PyObject * pyfreetype_Font_get_kerning(PyObject * self, PyObject * args, PyObject * kwargs)
 {
 	int first = 0;
@@ -261,7 +289,7 @@ static PyObject * pyfreetype_Font_get_kerning(PyObject * self, PyObject * args, 
 
 	pyfreetype_Font * font = (pyfreetype_Font *)self;
 
-	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii|i", keywords, &first, &second, mode))
+	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii|i", keywords, &first, &second, &mode))
 		return NULL;
 
 	switch (mode)
@@ -291,8 +319,6 @@ static PyMethodDef font_methods[] = {
 	{"set_pixel_size",				pyfreetype_Font_set_pixel_size,				METH_VARARGS,	"Set the character size (in pixels) for subsequent operations."},
 	{"get_char_bitmap",				pyfreetype_Font_get_char_bitmap,			METH_VARARGS,	"Set the character size (in pixels) for subsequent operations."},
 	{"get_char_metrics",			pyfreetype_Font_get_char_metrics,			METH_VARARGS,	"Returns a structure with information about the character specified."},
-	{"get_global_design_metrics",	pyfreetype_Font_get_global_design_metrics,	METH_VARARGS,	"Returns a structure with information about the character specified."},
-	{"get_current_size_metrics",	pyfreetype_Font_get_current_size_metrics,	METH_VARARGS,	"Returns a structure with information about the character specified."},
 	{"get_kerning",					(PyCFunction)pyfreetype_Font_get_kerning,	METH_VARARGS|METH_KEYWORDS,	"Returns a structure with information about the character specified."},
 
 	{NULL}

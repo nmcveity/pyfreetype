@@ -56,13 +56,22 @@ static PyObject* pyfreetype_CharMapIter_iternext(PyObject *self)
 	}
 }
 
+static void pyfreetype_CharMapIter_dealloc(pyfreetype_Font * self)
+{
+	Py_DECREF(self->m_face);
+
+	self->ob_type->tp_free((PyObject*)self);
+}
+
+
 PyTypeObject pyfreetype_CharMapIterType= {
 	PyObject_HEAD_INIT(NULL)
 	0,									/*ob_size*/
 	"pyfreetype.CharMapIter",			/*tp_name*/
 	sizeof(pyfreetype_CharMapIter),		/*tp_basicsize*/
 	0,                         			/*tp_itemsize*/
-	0,                         			/*tp_dealloc*/
+	(destructor)
+	pyfreetype_CharMapIter_dealloc,     /*tp_dealloc*/
 	0,                         			/*tp_print*/
 	0,                         			/*tp_getattr*/
 	0,                         			/*tp_setattr*/
@@ -87,10 +96,6 @@ PyTypeObject pyfreetype_CharMapIterType= {
 	pyfreetype_CharMapIter_iternext,	/* tp_iternext: next() method */
 };
 
-static PyMethodDef iter_methods[] = {
-	{NULL}  /* Sentinel */
-};
-
 void pyfreetype_register_charmapiter_type(PyObject * module)
 {
 	pyfreetype_CharMapIterType.tp_new = PyType_GenericNew;
@@ -100,5 +105,4 @@ void pyfreetype_register_charmapiter_type(PyObject * module)
 
 	// NICK: is this required if we dont register with module?
 	Py_INCREF(&pyfreetype_CharMapIterType);
-	//PyModule_AddObject(module, "Font", (PyObject *)&pyfreetype_CharMapIterType);
 }

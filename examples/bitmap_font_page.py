@@ -85,7 +85,9 @@ def build(fontfile, size, charset, max_texture_width=256, spacing=4):
 	
 	metrics_dict['kerning_pairs'] = kerning_pairs
 	
-	return tex, json.dumps(metrics_dict, indent=4)
+	del font
+	
+	return tex, json.dumps(metrics_dict, indent=1)
 
 if __name__ == "__main__":
 	from optparse import OptionParser

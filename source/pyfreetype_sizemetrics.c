@@ -19,17 +19,13 @@ PyTypeObject pyfreetype_SizeMetricsType= {
 	0,                         			/*tp_as_sequence*/
 	0,                         			/*tp_as_mapping*/
 	0,                         			/*tp_hash */
-	0,                         			/*tp_call*/
+	0,									/*tp_call*/
 	0,									/*tp_str*/
 	0,                         			/*tp_getattro*/
 	0,                         			/*tp_setattro*/
 	0,                         			/*tp_as_buffer*/
 	Py_TPFLAGS_DEFAULT,        			/*tp_flags*/
 	"Size metrics",        				/*tp_doc */
-};
-
-static PyMethodDef metrics_methods[] = {
-	{NULL}  /* Sentinel */
 };
 
 static PyMemberDef metrics_members[] = {
@@ -55,5 +51,4 @@ void pyfreetype_register_sizemetrics_type(PyObject * module)
 
 	// NICK: is this required if we dont register with module?
 	Py_INCREF(&pyfreetype_SizeMetricsType);
-	//PyModule_AddObject(module, "Font", (PyObject *)&pyfreetype_SizeMetricsType);
 }

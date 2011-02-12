@@ -3,13 +3,24 @@
 
 #include "structmember.h"		// PyMemberDef, T_*
 
+static void pyfreetype_BitmapData_dealloc(pyfreetype_BitmapData * self)
+{
+	Py_DECREF(self->m_left);
+	Py_DECREF(self->m_top);
+	Py_DECREF(self->m_pixels);
+
+	self->ob_type->tp_free((PyObject*)self);
+}
+
+
 PyTypeObject pyfreetype_BitmapDataType= {
 	PyObject_HEAD_INIT(NULL)
 	0,									/*ob_size*/
 	"pyfreetype.BitmapData",			/*tp_name*/
 	sizeof(pyfreetype_BitmapData),		/*tp_basicsize*/
 	0,                         			/*tp_itemsize*/
-	0,                         			/*tp_dealloc*/
+	(destructor)pyfreetype_BitmapData_dealloc, 
+										/*tp_dealloc*/
 	0,                         			/*tp_print*/
 	0,                         			/*tp_getattr*/
 	0,                         			/*tp_setattr*/
@@ -28,11 +39,7 @@ PyTypeObject pyfreetype_BitmapDataType= {
 	"Bitmap Data",        				/*tp_doc */
 };
 
-static PyMethodDef metrics_methods[] = {
-	{NULL}  /* Sentinel */
-};
-
-static PyMemberDef metrics_members[] = {
+static PyMemberDef bitmap_members[] = {
 	{"width",	T_INT,			offsetof(pyfreetype_BitmapData, m_width), READONLY, "Width of character, in points."},
 	{"height",	T_INT,			offsetof(pyfreetype_BitmapData, m_height), READONLY, "Height of character, in points."},
 	{"left",	T_OBJECT_EX,	offsetof(pyfreetype_BitmapData, m_left), READONLY, "Horizontal Bearing X, in points."},
@@ -45,12 +52,11 @@ static PyMemberDef metrics_members[] = {
 void pyfreetype_register_bitmapdata_type(PyObject * module)
 {
 	pyfreetype_BitmapDataType.tp_new = PyType_GenericNew;
-	pyfreetype_BitmapDataType.tp_members = metrics_members;
+	pyfreetype_BitmapDataType.tp_members = bitmap_members;
 
 	if (PyType_Ready(&pyfreetype_BitmapDataType) < 0)
 		return;
 
 	// NICK: is this required if we don't register with module?
 	Py_INCREF(&pyfreetype_BitmapDataType);
-	//PyModule_AddObject(module, "Font", (PyObject *)&pyfreetype_BitmapDataType);
 }

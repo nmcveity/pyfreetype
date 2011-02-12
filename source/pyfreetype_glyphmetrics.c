@@ -28,10 +28,6 @@ PyTypeObject pyfreetype_GlyphMetricsType= {
 	"Glyph metrics",        			/*tp_doc */
 };
 
-static PyMethodDef metrics_methods[] = {
-	{NULL}  /* Sentinel */
-};
-
 static PyMemberDef metrics_members[] = {
 	{"width",				T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_width), READONLY, "Width of character, in points."},
 	{"height",				T_FLOAT,	offsetof(pyfreetype_GlyphMetrics, m_height), READONLY, "Height of character, in points."},
@@ -59,5 +55,4 @@ void pyfreetype_register_glyphmetrics_type(PyObject * module)
 
 	// NICK: is this required if we dont register with module?
 	Py_INCREF(&pyfreetype_GlyphMetricsType);
-	//PyModule_AddObject(module, "Font", (PyObject *)&pyfreetype_CharMapIterType);
 }

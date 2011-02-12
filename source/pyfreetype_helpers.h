@@ -15,4 +15,12 @@ extern const char * pyfreetype_GetErrorCode(FT_Error code);
 extern struct FT_LibraryRec_ * ftlib;
 extern PyObject * FTErrorException;
 
+#ifndef TRUE
+#define TRUE (1)
+#endif
+
+#ifndef FALSE
+#define FALSE (0)
+#endif
+
 #endif // INCLUDED_pyfreetype_helpers_h
