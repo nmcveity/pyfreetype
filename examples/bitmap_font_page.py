@@ -2,6 +2,7 @@ import pyfreetype
 import PIL
 import PIL.Image
 import math
+import json
 
 def build(fontfile, size, charset, max_texture_width=256, spacing=4):
 	font = pyfreetype.open_font(fontfile)
@@ -26,21 +27,37 @@ def build(fontfile, size, charset, max_texture_width=256, spacing=4):
 	tex_width = min(max_width * len(charset), max_texture_width)
 	tex_height = int(len(charset) / math.floor(tex_width / float(max_width)) * max_height)
 	
-	print tex_width, tex_height
-	print max_width, max_height
-	
 	tex = PIL.Image.new("L", (tex_width, tex_height))
+	
 	pen_x = 0
 	pen_y = 0
+	
+	metrics_dict = {}
 	
 	for ch in charset:
 		bitmap = font.get_char_bitmap(unicode(ch))
 		metrics = font.get_char_metrics(unicode(ch))
 		
+		metrics_dict[ch] = {
+			'width':				metrics.width,
+			'horiBearingX':			metrics.horiBearingX,
+			'horiBearingY':			metrics.horiBearingY,
+			'horiAdvance':			metrics.horiAdvance,
+			'vertBearingX':			metrics.vertBearingX,
+			'vertBearingY':			metrics.vertBearingY,
+			'vertAdvance':			metrics.vertAdvance,
+			'linearHoriAdvance':	metrics.linearHoriAdvance,
+			'linearVertAdvance':	metrics.linearVertAdvance,
+			'advanceX':				metrics.advanceX,
+			'advanceY':				metrics.advanceY,
+			'bitmapLeft':			pen_x+spacing,
+			'bitmapTop':			pen_y+spacing,
+			'bitmapWidth':			bitmap.width,
+			'bitmapHeight':			bitmap.height,
+		}
+		
 		image = PIL.Image.new("L", (bitmap.width, bitmap.height))
 		image.putdata(bitmap.pixels)
-		
-		print pen_x, pen_y, bitmap.width, bitmap.height
 		
 		tex.paste(image, (pen_x+spacing, pen_y+spacing))
 		
@@ -52,7 +69,7 @@ def build(fontfile, size, charset, max_texture_width=256, spacing=4):
 			pen_x = 0
 			pen_y += max_height
 	
-	return tex
+	return tex, json.dumps(metrics_dict, indent=4)
 
 if __name__ == "__main__":
 	from optparse import OptionParser
@@ -76,8 +93,12 @@ if __name__ == "__main__":
 	
 	default_charset = "ABCDEFGHIJKLMNOPQRSTUXYZabcdefghijklmnopqrstuvwxyz1234567890!$%.,:?'\"()/~"
 	
-	tex = build(options.font, options.size, default_charset)
+	tex, data = build(options.font, options.size, default_charset)
 	tex.save("%s.%s" % (options.output, options.ext))
+	
+	data_out = open("%s.json" % options.output, "wt")
+	data_out.write(data)
+	data_out.close()
 
 	
 
