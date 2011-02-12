@@ -494,6 +494,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\source\pyfreetype_helpers.c"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

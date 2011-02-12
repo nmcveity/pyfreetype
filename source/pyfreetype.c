@@ -11,6 +11,8 @@
 
 FT_Library ftlib = NULL;
 
+PyObject * FTErrorException = NULL;
+
 static PyObject * pyfreetype_ft_version(PyObject * self, PyObject * args)
 {
 	return Py_BuildValue("(iii)", FREETYPE_MAJOR, FREETYPE_MINOR, FREETYPE_PATCH);
@@ -29,7 +31,7 @@ static PyObject * pyfreetype_open_font(PyObject * self, PyObject * args)
 	err = FT_New_Face(ftlib, filename, index, &font->m_face);
 
 	if (err)
-		return NULL;
+		return pyfreetype_SetErrorAndReturn("FT_New_Face", err);
 
 	font->m_numCharMaps = PyInt_FromLong(font->m_face->num_charmaps);
 	font->m_familyName = PyString_FromString(font->m_face->family_name);
@@ -87,7 +89,8 @@ PyMODINIT_FUNC initpyfreetype(void)
 
 	if (res)
 	{
-		// SERIOUS ERROR NEEDS HANDLING!
+		PyErr_SetObject(PyExc_SystemError, PyString_FromFormat("Failed to initialise FT_Library: (%d) - %s", res, pyfreetype_GetErrorCode(res)));
+		return;
 	}
 
 	module = Py_InitModule("pyfreetype", ModuleMethods);
@@ -96,4 +99,7 @@ PyMODINIT_FUNC initpyfreetype(void)
 	pyfreetype_register_charmapiter_type(module);
 	pyfreetype_register_glyphmetrics_type(module);
 	pyfreetype_register_bitmapdata_type(module);
+
+	FTErrorException = PyErr_NewException("pyfreetype.FTError", NULL, NULL);
+	Py_INCREF(FTErrorException);
 }

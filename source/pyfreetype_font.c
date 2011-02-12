@@ -111,7 +111,7 @@ static PyObject * pyfreetype_Font_set_char_size(PyObject * self, PyObject * args
 	res = FT_Set_Char_Size(font->m_face, char_width<<6, char_height<<6, horz_res, vert_res);
 
 	if (res)
-		return NULL;
+		return pyfreetype_SetErrorAndReturn("FT_Set_Char_Size", res);
 
 	pyfreetype_Font_update_size_metrics(font);
 
@@ -132,7 +132,7 @@ static PyObject * pyfreetype_Font_set_pixel_size(PyObject * self, PyObject * arg
 	res = FT_Set_Pixel_Sizes(font->m_face, char_width, char_height);
 
 	if (res)
-		return NULL;
+		return pyfreetype_SetErrorAndReturn("FT_Set_Pixel_Sizes", res);
 
 	pyfreetype_Font_update_size_metrics(font);
 
@@ -170,10 +170,7 @@ static PyObject * pyfreetype_Font_get_char_bitmap(PyObject * self, PyObject * ar
 	res = FT_Load_Glyph(font->m_face, glyphIndex, FT_LOAD_RENDER);
 
 	if (res)
-	{
-		PyErr_SetString(PyExc_TypeError, "Failed to load glyph");
-		return NULL;
-	}
+		return pyfreetype_SetErrorAndReturn("FT_Load_Glyph(FT_LOAD_RENDER)", res);
 
 	ftbitmap = &font->m_face->glyph->bitmap;
 
@@ -244,10 +241,7 @@ static PyObject * pyfreetype_Font_get_char_metrics(PyObject * self, PyObject * a
 	res = FT_Load_Glyph(font->m_face, glyphIndex, 0);
 
 	if (res)
-	{
-		PyErr_SetString(PyExc_TypeError, "Failed to load glyph");
-		return NULL;
-	}
+		return pyfreetype_SetErrorAndReturn("FT_Load_Glyph", res);
 
 	metrics = (pyfreetype_GlyphMetrics *)pyfreetype_GlyphMetricsType.tp_alloc(&pyfreetype_GlyphMetricsType, 0);
 	metrics->m_width = font->m_face->glyph->metrics.width / 64.0f;
