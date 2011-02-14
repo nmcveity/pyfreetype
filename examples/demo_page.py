@@ -35,5 +35,19 @@ def generate_page(fontfile, str="The quick brown fox jumped over the lazy dog", 
 			
 	return image
 
-img = generate_page("examples/ubuntu/Ubuntu-I.ttf")
-img.save("examples/Preview-Ubuntu-Italic.png")
+#img = generate_page("examples/ubuntu/Ubuntu-I.ttf")
+#img.save("examples/Preview-Ubuntu-Italic.png")
+
+if __name__ == "__main__":
+	from optparse import OptionParser
+	
+	parser = OptionParser()
+	parser.add_option("-f", "--font", dest="font", help="The filename of the font to use", action="store", default="examples/ubuntu/Ubuntu-I.ttf")
+	parser.add_option("-o", "--output", dest="output", help="The output file name", action="store", default="examples/Preview-Ubuntu-Italic.png")
+
+	(options, args) = parser.parse_args()
+	
+	img = generate_page(options.font)
+	img.save(options.output)
+	
+	print "%s written." % options.output
