@@ -117,6 +117,8 @@ static int pyfreetype_Font_update_size_metrics(pyfreetype_Font * font)
 	size_metrics->m_height = PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(font->m_face->size->metrics.height);
 	size_metrics->m_max_advance = PYFREETYPE_26_6_FRACTIONAL_TO_FLOAT(font->m_face->size->metrics.max_advance);
 
+	font->m_size = (PyObject *)size_metrics;
+
 	return TRUE;
 }
 

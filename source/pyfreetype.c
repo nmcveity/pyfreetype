@@ -4,6 +4,7 @@
 #include "pyfreetype_charmapiter.h"
 #include "pyfreetype_glyphmetrics.h"
 #include "pyfreetype_bitmapdata.h"
+#include "pyfreetype_sizemetrics.h"
 #include "pyfreetype_helpers.h"
 
 #include <ft2build.h>
@@ -113,6 +114,7 @@ PyMODINIT_FUNC initpyfreetype(void)
 	pyfreetype_register_charmapiter_type(module);
 	pyfreetype_register_glyphmetrics_type(module);
 	pyfreetype_register_bitmapdata_type(module);
+	pyfreetype_register_sizemetrics_type(module);
 
 	FTErrorException = PyErr_NewException("pyfreetype.FTError", NULL, NULL);
 	Py_INCREF(FTErrorException);

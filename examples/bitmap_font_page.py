@@ -109,7 +109,7 @@ if __name__ == "__main__":
 	if options.output is None:
 		parser.error("You need to specify an --output option")
 	
-	default_charset = "ABCDEFGHIJKLMNOPQRSTUXYZabcdefghijklmnopqrstuvwxyz1234567890!$%.,:?'\"()/~"
+	default_charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!$%.,:?'\"()/~"
 	
 	tex, data = build(options.font, options.size, default_charset)
 	tex.save("%s.%s" % (options.output, options.ext))
