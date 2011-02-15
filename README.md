@@ -20,6 +20,11 @@ http://freetype.sourceforge.net/freetype2/documentation.html
 
 In particular, check out the tutorial, the FAQ and the Glyph Convensions guide.
 
+Installation
+------------
+
+Coming ...
+
 Examples
 --------
 
