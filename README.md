@@ -28,6 +28,13 @@ In particular, check out the tutorial, the FAQ and the Glyph Convensions guide.
 Installation
 ------------
 
+**BINARY VERSIONS**
+
+If you wish to run this with Python 2.7 then there are some prebuilt windows binaries
+available [here](https://github.com/nmcveity/pyfreetype/archives/master), otherwise ...
+
+**SOURCE VERSIONS**
+
 Download and build FreeType 2 from [here](http://freetype.sourceforge.net/download.html#stable).
 The library has been tested with 2.3.12 but other versions should work too.
 
@@ -49,6 +56,8 @@ marked at the top of setup.py.
 
 This process has only been tested on Windows, please send any success stories
 to nmcveity at gmail dot com.
+
+
 
 Examples
 --------
