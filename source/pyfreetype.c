@@ -91,8 +91,8 @@ static PyObject * pyfreetype_open_font(PyObject * self, PyObject * args)
 
 static PyMethodDef ModuleMethods[] = 
 {
-	{"version",		pyfreetype_ft_version,	METH_VARARGS,	"Retrieve the freetype version used by this module."},
-	{"open_font",	pyfreetype_open_font,	METH_VARARGS,	"Load a new font object and return it."},
+	{"ft2_version",		pyfreetype_ft_version,	METH_VARARGS,	"Retrieve the freetype version used by this module."},
+	{"open_font",		pyfreetype_open_font,	METH_VARARGS,	"Load a new font object and return it."},
 
 	{NULL, NULL, 0, NULL}        /* Sentinel */
 };
