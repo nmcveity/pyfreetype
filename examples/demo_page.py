@@ -35,9 +35,6 @@ def generate_page(fontfile, str="The quick brown fox jumped over the lazy dog", 
 			
 	return image
 
-#img = generate_page("examples/ubuntu/Ubuntu-I.ttf")
-#img.save("examples/Preview-Ubuntu-Italic.png")
-
 if __name__ == "__main__":
 	from optparse import OptionParser
 	
