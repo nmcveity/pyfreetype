@@ -1,6 +1,11 @@
 pyfreetype - A freetype2 binding for Python
 ===========================================
 
+THIS SOFTWARE IS CURRENTLY ALPHA AND HAS ONLY BEEN TESTED WITH PYTHON 2.7 AND
+FREETYPE 2.3.12 ON A WINDOWS MACHINE.  PLEASE MAIL ME IF YOU SUCCESSFULLY DEPLOY
+ON ANY OTHER CONFIGURATIONS AND WHAT(IF?) CHANGES YOU MADE VIA NMCVEITY AT GMAIL
+DOT COM.
+
 [FreeType](http://freetype.org/)
 
 [Python](http://www.python.org/)
@@ -23,7 +28,27 @@ In particular, check out the tutorial, the FAQ and the Glyph Convensions guide.
 Installation
 ------------
 
-Coming ...
+Download and build FreeType 2 from [here](http://freetype.sourceforge.net/download.html#stable).
+The library has been tested with 2.3.12 but other versions should work too.
+
+Pull git repository contents from [here](https://github.com/nmcveity/pyfreetype) and 
+open a shell window at your local copy.  Execute:
+
+	python setup.py install
+
+Note: This will only work if the FreeType library you just downloaded and built 
+can be found by distutils.  This will likely _not_ be the case.  To help distutils
+find this information, run these commands instead:
+
+	python setup.py build_ext --library-dirs=/path/to/lib --include-dirs=/path/to/include
+	python setup.py install
+
+On Windows, you will also need to edit setup.py to contain exact version number
+of the FreeType distribution you downloaded.  The variables to change are clearly 
+marked at the top of setup.py.
+
+This process has only been tested on Windows, please send any success stories
+to nmcveity at gmail dot com.
 
 Examples
 --------

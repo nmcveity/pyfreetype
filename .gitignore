@@ -1,5 +1,8 @@
 Debug
 Release
+users
+dist
+build
 *.ncb
 *.suo
 *.user
