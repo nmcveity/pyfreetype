@@ -1,7 +1,8 @@
 pyfreetype - A freetype2 binding for Python
--------------------------------------------
+===========================================
 
 [FreeType](http://freetype.org/)
+
 [Python](http://www.python.org/)
 
 Introduction
@@ -30,13 +31,13 @@ information, as well as the location of each glyph in the bitmap.  This is
 useful in multimedia applications, such as games, where text is draw using
 hardware acceleration (a quad per character).
 
-compare.py: Generates an image file containing an example string for a list
+**compare.py**: Generates an image file containing an example string for a list
 of fonts.  
 
-compare_all.py: Generates an image file containing an example string for 
+**compare_all.py**: Generates an image file containing an example string for 
 all fonts in a directory.
 
-demo_page.py: Generates an image containing a sample of text rendered in a
+**demo_page.py**: Generates an image containing a sample of text rendered in a
 specific font at various sizes.
 
 API
@@ -51,18 +52,17 @@ The module has two methods:
 	font = pyfreetype.open_font(filename)
 	major, minor, release = pyfreetype.ft2_version()
 
-pyfreetype.ft2_version() - Returns a three value tuple with the major, minor
+**pyfreetype.ft2_version()** - Returns a three value tuple with the major, minor
 and release number of the FreeType library that pyfreetype is linked against.
 
-pyfreetype.open_font(name) - Loads the font 'name' (should be a file path to
+**pyfreetype.open_font(name)** - Loads the font 'name' (should be a file path to
 a supported font file type).  Returns a font object which you interact with
 for all other operations.
 
 See [here](http://freetype.org/freetype2/docs/ft2faq.html#general-what) for a list of
 file formats supported by FreeType.
 
-Font Objects
-============
+### Font Objects
 
 A font object supports the following methods:
 
@@ -115,16 +115,16 @@ information scaled to the size.  Documentation for the size object is below.
 
 	size
 
-font.set_pixel_size(width, height) - Before performing many of the operations
+**font.set_pixel_size(width, height)** - Before performing many of the operations
 on a font you must first select the size.  This function allows you to set 
 the size in pixels.  
 
-font.set_char_size(width, height, horz_dpi, vert_dpi) - Before performing many
+**font.set_char_size(width, height, horz_dpi, vert_dpi)** - Before performing many
 of the operations on a font you must first select the size.  This function 
 allows you to set the size in points, which FreeType converts to pixels using
 the DPI of the output device.
 
-font.get_char_bitmap(charcode) - Returns a bitmap object containing a glyph
+**font.get_char_bitmap(charcode)** - Returns a bitmap object containing a glyph
 rendered at the current size.  The parameter 'charcode' is the CODE POINT for
 the character in the [Universal Charactet Set](http://en.wikipedia.org/wiki/Universal_Character_Set).
 
@@ -134,17 +134,16 @@ You would use this method in python like such:
 
 The fields in the returned bitmap object are described below.
 
-font.get_char_metrics(charcode) - Returns a metrics object containing the
+**font.get_char_metrics(charcode)** - Returns a metrics object containing the
 metrics for a glyph rendered at the current font size.  As with get_char_bitmap
 the parameter must be the CODE POINT for the character.
 
 The fields in the returned metrics object are described below.
 
-font.get_kerning(left, right) - Returns the kerning vector between two 
+**font.get_kerning(left, right)** - Returns the kerning vector between two 
 characters at the current font size.
 
-Bitmap Objects
-==============
+### Bitmap Objects
 
 	bitmap.width 		# the width of the bitmap
 	bitmap.height		# the height of the bitmap
@@ -167,8 +166,7 @@ Note that the bitmap is cropped to fit the glyph exactly, so when drawing the
 bitmap you need to offset it using 'left' and 'top' (this is covered in the
 FreeType tutorial).
 
-Metrics Objects
-===============
+### Metrics Objects
 
 	metrics.width
 	metrics.height
@@ -190,8 +188,7 @@ These all correspond to the members in the FT_Glyph_Metrics struct documented
 These two values correspond to the 'advance' field in the FT_GlyphSlotRec 
 struct documented [here](http://freetype.sourceforge.net/freetype2/docs/reference/ft2-base_interface.html#FT_GlyphSlotRec)
 
-Size Objects
-============
+### Size Objects
 
 These members all correspond to the members in the FT_Size_Metrics structure,
 documented [here](http://freetype.sourceforge.net/freetype2/docs/reference/ft2-base_interface.html#FT_Size_Metrics)
@@ -204,4 +201,3 @@ documented [here](http://freetype.sourceforge.net/freetype2/docs/reference/ft2-b
 	font.size.descender
 	font.size.height
 	font.size.max_advance
-
