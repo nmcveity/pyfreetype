@@ -9,6 +9,7 @@ from distutils.core import setup, Extension
 
 import os
 import os.path
+import subprocess
 import distutils
 import distutils.ccompiler
 
@@ -24,10 +25,31 @@ sources = [
 	os.path.join("source", "pyfreetype_sizemetrics.c"),
 ]
 
+try:
+	extra_compile_args = subprocess.check_output(["freetype-config", "--cflags"]).split()
+except OSError as e:
+	print "!! Unable to run freetype-config to automatically derive CFLAGS."
+	print "!! This is normal on windows but on linux may indicate a missing freetype2-dev package."
+	print "!! Either install (sudo apt-get install freetype2.dev) or manually configure paths on command line."
+else:
+	print ":) Found freetype-config for CFLAGS"
+	print "     " + " ".join(extra_compile_args)
+
+try:
+	extra_link_args = subprocess.check_output(["freetype-config", "--libs"]).split()
+except OSError as e:
+	print "!! Unable to run freetype-config to automatically derive LIBS."
+	print "!! This is normal on windows but on linux may indicate a missing freetype2-dev package."
+	print "!! Either install (sudo apt-get install freetype2.dev) or manually configure paths on command line."
+else:
+	print ":) Found freetype-config for LIBS"
+	print "     " + " ".join(extra_link_args)
+
 if distutils.ccompiler.get_default_compiler() == "msvc":
 	libraries = [
 		"freetype%d%d%d" % (FT2_MAJOR, FT2_MINOR, FT2_PATCH)
 	]
+
 else:
 	libraries = [
 		"freetype"
@@ -39,7 +61,7 @@ cppdefines = [
 
 setup(
 	name="pyfreetype",
-	version="0.1",
+	version="0.2",
 	description="Python bindings for FreeType 2",
 	long_description="Python bindings for FreeType 2",
 	author="Nick McVeity",
@@ -53,7 +75,9 @@ setup(
 	],
 	license="License :: OSI Approved :: BSD License",
 	ext_modules=[
-		Extension('pyfreetype', sources, 
+		Extension('pyfreetype', sources,
+			extra_compile_args=extra_compile_args,
+			extra_link_args=extra_link_args,
 			libraries=libraries,
 			define_macros=cppdefines
 		)
