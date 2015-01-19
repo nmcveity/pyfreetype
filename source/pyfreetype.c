@@ -31,7 +31,7 @@ static PyObject * pyfreetype_open_font(PyObject * self, PyObject * args)
 	if (!PyArg_ParseTuple(args, "s|i", &filename, &index))
 		return NULL;
 
-	font = PyObject_New(pyfreetype_Font, &pyfreetype_FontType);
+	font = pyfreetype_Font_new(&pyfreetype_FontType, 0, 0);
 
 	if (font == NULL)
 		return NULL;

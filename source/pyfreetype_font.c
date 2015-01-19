@@ -11,7 +11,48 @@
 
 static PyObject * pyfreetype_Font_repr(pyfreetype_Font * self)
 {
-	return PyString_FromFormat("<font '%s'>", self->m_face->family_name);
+	return PyString_FromFormat("<font '%s'>", ((self && self->m_face) ? self->m_face->family_name : "unloaded"));
+}
+
+PyObject * pyfreetype_Font_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  pyfreetype_Font * self = (pyfreetype_Font *)type->tp_alloc(type, 0);
+
+  if (self != NULL) 
+  {
+	  self->m_numCharMaps = NULL;
+		self->m_familyName = NULL;
+		self->m_styleName = NULL;
+		self->m_is_flag_scalable = NULL;
+		self->m_is_flag_fixed_sizes = NULL;
+		self->m_is_flag_fixed_width = NULL;
+		self->m_is_flag_sfnt = NULL;
+		self->m_is_flag_horizontal = NULL;
+		self->m_is_flag_vertical = NULL;
+		self->m_is_flag_kerning = NULL;
+		self->m_is_flag_fast_glyphs = NULL;
+		self->m_is_flag_multiple_masters = NULL;
+		self->m_is_flag_names = NULL;
+		self->m_is_flag_external_stream = NULL;
+		self->m_is_flag_hinter = NULL;
+		self->m_is_flag_cid_keyed = NULL;
+		self->m_is_flag_tricky = NULL;
+		self->m_is_bold = NULL;
+		self->m_is_italic = NULL;
+		self->m_bbox = NULL;
+		self->m_units_per_EM = NULL;
+		self->m_ascender = NULL;
+		self->m_descender = NULL;
+		self->m_height = NULL;
+		self->m_max_advance_width = NULL;
+		self->m_max_advance_height = NULL;
+		self->m_underline_position = NULL;
+		self->m_underline_thickness = NULL;
+		self->m_size = NULL;
+		self->m_face = NULL;
+  }
+
+  return (PyObject *)self;	
 }
 
 static void pyfreetype_Font_dealloc(pyfreetype_Font * self)
@@ -54,26 +95,43 @@ static void pyfreetype_Font_dealloc(pyfreetype_Font * self)
 PyTypeObject pyfreetype_FontType= {
 	PyObject_HEAD_INIT(NULL)
 	0,									/*ob_size*/
-	"pyfreetype.Font",					/*tp_name*/
-	sizeof(pyfreetype_Font),			/*tp_basicsize*/
-	0,                         			/*tp_itemsize*/
-	(destructor)pyfreetype_Font_dealloc,/*tp_dealloc*/
-	0,                         			/*tp_print*/
-	0,                         			/*tp_getattr*/
-	0,                         			/*tp_setattr*/
-	0,                         			/*tp_compare*/
-	(reprfunc)pyfreetype_Font_repr,     /*tp_repr*/
-	0,                         			/*tp_as_number*/
-	0,                         			/*tp_as_sequence*/
-	0,                         			/*tp_as_mapping*/
-	0,                         			/*tp_hash */
-	0,                         			/*tp_call*/
-	(reprfunc)pyfreetype_Font_repr,     /*tp_str*/
-	0,                         			/*tp_getattro*/
-	0,                         			/*tp_setattro*/
-	0,                         			/*tp_as_buffer*/
-	Py_TPFLAGS_DEFAULT,        			/*tp_flags*/
-	"Font objects",           			/*tp_doc */
+	"pyfreetype.Font",					    /* tp_name */
+	sizeof(pyfreetype_Font),			  /* tp_basicsize */
+	0,                         			/* tp_itemsize */
+	(destructor)pyfreetype_Font_dealloc,/* tp_dealloc */
+	0,                         			/* tp_print */
+	0,                         			/* tp_getattr */
+	0,                         			/* tp_setattr */
+	0,                         			/* tp_compare */
+	(reprfunc)pyfreetype_Font_repr, /* tp_repr */
+	0,                         			/* tp_as_number */
+	0,                         			/* tp_as_sequence */
+	0,                         			/* tp_as_mapping */
+	0,                         			/* tp_hash */
+	0,                         			/* tp_call */
+	(reprfunc)pyfreetype_Font_repr, /* tp_str */
+	0,                         			/* tp_getattro */
+	0,                         			/* tp_setattro */
+	0,                         			/* tp_as_buffer */
+	Py_TPFLAGS_DEFAULT,        			/* tp_flags */
+	"Font objects",           			/* tp_doc */
+	0,		               						/* tp_traverse */
+	0,		               						/* tp_clear */
+	0,		               						/* tp_richcompare */
+	0,		               						/* tp_weaklistoffset */
+	0,		               						/* tp_iter */
+	0,		               						/* tp_iternext */
+	0,             									/* tp_methods - FILLED IN LATER */
+	0,             									/* tp_members - FILLED IN LATER */
+	0,                         			/* tp_getset */
+	0,                         			/* tp_base */
+	0,                         			/* tp_dict */
+	0,                         			/* tp_descr_get */
+	0,                         			/* tp_descr_set */
+	0,                         			/* tp_dictoffset */
+	0,										     			/* tp_init */
+	0,                         			/* tp_alloc */
+	pyfreetype_Font_new,            /* tp_new */
 };
 
 static PyObject * pyfreetype_Font_charmaps(PyObject *self, PyObject *args)

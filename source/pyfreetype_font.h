@@ -52,5 +52,6 @@ typedef struct pyfreetype_Font_ {
 
 extern PyTypeObject pyfreetype_FontType;
 extern void pyfreetype_register_font_type(PyObject * module);
+extern PyObject * pyfreetype_Font_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
 #endif // INCLUDED_pyfreetype_font_h
