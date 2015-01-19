@@ -16,37 +16,35 @@ static PyObject * pyfreetype_Font_repr(pyfreetype_Font * self)
 
 static void pyfreetype_Font_dealloc(pyfreetype_Font * self)
 {
-	Py_DECREF(self->m_numCharMaps);
-	Py_DECREF(self->m_familyName);
-	Py_DECREF(self->m_styleName);
-	Py_DECREF(self->m_is_flag_scalable);
-	Py_DECREF(self->m_is_flag_fixed_sizes);
-	Py_DECREF(self->m_is_flag_fixed_width);
-	Py_DECREF(self->m_is_flag_sfnt);
-	Py_DECREF(self->m_is_flag_horizontal);
-	Py_DECREF(self->m_is_flag_vertical);
-	Py_DECREF(self->m_is_flag_kerning);
-	Py_DECREF(self->m_is_flag_fast_glyphs);
-	Py_DECREF(self->m_is_flag_multiple_masters);
-	Py_DECREF(self->m_is_flag_names);
-	Py_DECREF(self->m_is_flag_external_stream);
-	Py_DECREF(self->m_is_flag_hinter);
-	Py_DECREF(self->m_is_flag_cid_keyed);
-	Py_DECREF(self->m_is_flag_tricky);
-	Py_DECREF(self->m_is_bold);
-	Py_DECREF(self->m_is_italic);
-	Py_DECREF(self->m_bbox);
-	Py_DECREF(self->m_units_per_EM);
-	Py_DECREF(self->m_ascender);
-	Py_DECREF(self->m_descender);
-	Py_DECREF(self->m_height);
-	Py_DECREF(self->m_max_advance_width);
-	Py_DECREF(self->m_max_advance_height);
-	Py_DECREF(self->m_underline_position);
-	Py_DECREF(self->m_underline_thickness);
-
-	if (self->m_size)
-		Py_DECREF(self->m_size);
+	Py_CLEAR(self->m_numCharMaps);
+	Py_CLEAR(self->m_familyName);
+	Py_CLEAR(self->m_styleName);
+	Py_CLEAR(self->m_is_flag_scalable);
+	Py_CLEAR(self->m_is_flag_fixed_sizes);
+	Py_CLEAR(self->m_is_flag_fixed_width);
+	Py_CLEAR(self->m_is_flag_sfnt);
+	Py_CLEAR(self->m_is_flag_horizontal);
+	Py_CLEAR(self->m_is_flag_vertical);
+	Py_CLEAR(self->m_is_flag_kerning);
+	Py_CLEAR(self->m_is_flag_fast_glyphs);
+	Py_CLEAR(self->m_is_flag_multiple_masters);
+	Py_CLEAR(self->m_is_flag_names);
+	Py_CLEAR(self->m_is_flag_external_stream);
+	Py_CLEAR(self->m_is_flag_hinter);
+	Py_CLEAR(self->m_is_flag_cid_keyed);
+	Py_CLEAR(self->m_is_flag_tricky);
+	Py_CLEAR(self->m_is_bold);
+	Py_CLEAR(self->m_is_italic);
+	Py_CLEAR(self->m_bbox);
+	Py_CLEAR(self->m_units_per_EM);
+	Py_CLEAR(self->m_ascender);
+	Py_CLEAR(self->m_descender);
+	Py_CLEAR(self->m_height);
+	Py_CLEAR(self->m_max_advance_width);
+	Py_CLEAR(self->m_max_advance_height);
+	Py_CLEAR(self->m_underline_position);
+	Py_CLEAR(self->m_underline_thickness);
+	Py_CLEAR(self->m_size);
 
 	FT_Done_Face(self->m_face);
 
