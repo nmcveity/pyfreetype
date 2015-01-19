@@ -173,7 +173,6 @@ static PyObject * pyfreetype_Font_get_char_bitmap(PyObject * self, PyObject * ar
 	FT_UInt glyphIndex = 0;
 	FT_Error res = 0;
 	FT_Bitmap * ftbitmap = NULL;
-	Py_UNICODE * buffer = NULL;
 	PyObject * bytes = NULL;
 	pyfreetype_BitmapData * bitmap = NULL;
 
@@ -196,13 +195,13 @@ static PyObject * pyfreetype_Font_get_char_bitmap(PyObject * self, PyObject * ar
 		FT_Bitmap_New(&adjusted);
 		FT_Bitmap_Convert(ftlib, ftbitmap, &adjusted, 1);
 
-		bytes = PyByteArray_FromStringAndSize(adjusted.buffer, adjusted.width * adjusted.rows);
+		bytes = PyByteArray_FromStringAndSize((const char*)adjusted.buffer, adjusted.width * adjusted.rows);
 
 		FT_Bitmap_Done(ftlib, &adjusted);
 	}
 	else
 	{
-		bytes = PyByteArray_FromStringAndSize(ftbitmap->buffer, ftbitmap->width * ftbitmap->rows);
+		bytes = PyByteArray_FromStringAndSize((const char*)ftbitmap->buffer, ftbitmap->width * ftbitmap->rows);
 	}
 
 	
@@ -241,7 +240,6 @@ static PyObject * pyfreetype_Font_get_char_metrics(PyObject * self, PyObject * a
 	pyfreetype_Font * font = (pyfreetype_Font *)self;
 	FT_UInt glyphIndex = 0;
 	FT_Error res = 0;
-	Py_UNICODE * buffer = NULL;
 	pyfreetype_GlyphMetrics * metrics = NULL;
 
 	if (!PyArg_ParseTuple(args, "i", &codepoint))
